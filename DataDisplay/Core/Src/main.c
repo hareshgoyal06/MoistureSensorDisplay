@@ -34,15 +34,31 @@ int main(void)
 
     while (1)
     {
-        // Receive data via UART
-        if (HAL_UART_Receive(&huart1, (uint8_t *)rxBuffer, sizeof(rxBuffer), HAL_MAX_DELAY) == HAL_OK)
-        {
-            // Extract temperature and moisture from received data
-        	sscanf(rxBuffer, "%*c%[^,],%s", temperature, moisture);
+    	// Receive data via UART
+		if (HAL_UART_Receive(&huart1, (uint8_t *)rxBuffer, sizeof(rxBuffer), HAL_MAX_DELAY) == HAL_OK)
+		{
+			// Extract temperature and moisture from received data
+			sscanf(rxBuffer, "%*c%[^,],%s", temperature, moisture);
+
+			// Clear LCD and display the data
+			HD44780_Clear();
+			HAL_Delay(500);  // Delay for readability
+			HD44780_SetCursor(0, 0);  // Line 1
+			HD44780_PrintStr("Moisture: ");
+			HD44780_PrintStr(moisture);
+			HD44780_PrintStr("%");
+			HD44780_SetCursor(0, 1);  // Line 2
+			HD44780_PrintStr("Temp: ");
+			HD44780_PrintStr(temperature);
+			HD44780_PrintStr(" C");
+			float tempValue = atof(temperature);
+			float moistValue = atof(moisture);
 
 
-        }
-    }
+			// Clear the buffer after processing
+			memset(rxBuffer, 0, sizeof(rxBuffer));
+		}
+	}
 }
 
 /* Validate Data Format */
