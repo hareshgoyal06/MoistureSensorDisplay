@@ -87,6 +87,47 @@ static void MX_USART1_UART_Init(void)
     }
 }
 
+
+bool isValidData(const char *data)
+{
+    // Check if the data contains a comma
+    const char *commaPosition = strchr(data, ',');
+    if (commaPosition == NULL)
+    {
+        return false; // No comma found, invalid data
+    }
+
+    // Check if there are characters before and after the comma
+    if (commaPosition == data || *(commaPosition + 1) == '\0')
+    {
+        return false; // Missing temperature or moisture part
+    }
+
+    // Validate the temperature part
+    const char *temperaturePart = data;
+    const char *moisturePart = commaPosition + 1;
+
+    // Validate temperature (allows digits, '.', and '-')
+    for (const char *ptr = temperaturePart; ptr < commaPosition; ptr++)
+    {
+        if (!isdigit(*ptr) && *ptr != '.' && *ptr != '-')
+        {
+            return false; // Invalid character in temperature
+        }
+    }
+
+    // Validate moisture (allows only digits)
+    for (const char *ptr = moisturePart; *ptr != '\0'; ptr++)
+    {
+        if (!isdigit(*ptr))
+        {
+            return false; // Invalid character in moisture
+        }
+    }
+
+    return true; // Data is valid
+}
+
 /* I2C1 Initialization Function */
 static void MX_I2C1_Init(void)
 {
